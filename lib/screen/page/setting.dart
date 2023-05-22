@@ -1,4 +1,4 @@
-import 'package:fclash/main.dart';
+import 'package:fclash/fclash_init.dart';
 import 'package:fclash/screen/controller/theme_controller.dart';
 import 'package:fclash/service/autostart_service.dart';
 import 'package:fclash/service/clash_service.dart';

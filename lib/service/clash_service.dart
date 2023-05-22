@@ -7,8 +7,8 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:fclash/bean/clash_config_entity.dart';
+import 'package:fclash/fclash_init.dart';
 import 'package:fclash/generated_bindings.dart';
-import 'package:fclash/main.dart';
 import 'package:fclash/service/notification_service.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';

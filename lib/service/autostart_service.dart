@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:fclash/main.dart';
+import 'package:fclash/fclash_init.dart';
 import 'package:fclash/tools/autostart_utils.dart';
 import 'package:kommon/kommon.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';

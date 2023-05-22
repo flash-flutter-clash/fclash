@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:fclash/fclash_init.dart';
 import 'package:fclash/service/clash_service.dart';
 import 'package:flutter/material.dart';
 import 'package:kommon/kommon.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
-import '../../main.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);

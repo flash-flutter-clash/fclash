@@ -102,9 +102,6 @@ class _MainScreenState extends State<MainScreen>
   }
 
   _buildMobile() {
-    // 设置配置文件
-    Get.find<ClashService>()
-        .addProfile("myConfig", "https://defi.icu/foo.yaml");
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -174,7 +171,8 @@ class _MainScreenState extends State<MainScreen>
       child: Scaffold(
           body: Column(
         children: [
-          buildDesktopOptions(),
+          // buildDesktopOptions(),
+          const SizedBox(height: 30),
           Expanded(
               child: Row(
             children: [
@@ -184,6 +182,13 @@ class _MainScreenState extends State<MainScreen>
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
+                          const SizedBox(height: 20),
+                          Image.asset(
+                            'packages/fclash/assets/images/app_tray.png',
+                            width: 90,
+                            height: 90,
+                          ),
+                          const SizedBox(height: 20),
                           _buildOptions(
                             0,
                             'Proxy'.tr,
@@ -271,7 +276,6 @@ class _MainScreenState extends State<MainScreen>
 
   Widget buildMobileOptions() {
     final cs = Get.find<ClashService>();
-    final pages = [Proxy(), Setting()];
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(

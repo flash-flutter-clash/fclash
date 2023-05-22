@@ -169,63 +169,70 @@ class _MainScreenState extends State<MainScreen>
   _buildDesktop() {
     return DragToResizeArea(
       child: Scaffold(
-          body: Column(
-        children: [
-          // buildDesktopOptions(),
-          const SizedBox(height: 30),
-          Expanded(
+        body: Column(
+          children: [
+            // buildDesktopOptions(),
+            const SizedBox(height: 30),
+            Expanded(
               child: Row(
-            children: [
-              Column(
                 children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 20),
-                          Image.asset(
-                            'packages/fclash/assets/images/app_tray.png',
-                            width: 90,
-                            height: 90,
+                  Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 20),
+                              Image.asset(
+                                'packages/fclash/assets/images/app_tray.png',
+                                width: 90,
+                                height: 90,
+                              ),
+                              const SizedBox(height: 20),
+                              _buildOptions(
+                                0,
+                                'Proxy'.tr,
+                                iconAddress:
+                                    "packages/fclash/assets/images/代理管理工具.svg",
+                              ),
+                              _buildOptions(
+                                1,
+                                'Profile'.tr,
+                                iconAddress:
+                                    "packages/fclash/assets/images/文件.svg",
+                              ),
+                              _buildOptions(
+                                2,
+                                'Setting'.tr,
+                                iconAddress:
+                                    "packages/fclash/assets/images/设置.svg",
+                              ),
+                              _buildOptions(
+                                3,
+                                'Connections'.tr,
+                                iconAddress:
+                                    "packages/fclash/assets/images/连接.svg",
+                              ),
+                              _buildOptions(
+                                4,
+                                'Log'.tr,
+                                iconAddress:
+                                    "packages/fclash/assets/images/日志.svg",
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 20),
-                          _buildOptions(
-                            0,
-                            'Proxy'.tr,
-                            iconAddress:
-                                "packages/fclash/assets/images/代理管理工具.svg",
-                          ),
-                          _buildOptions(
-                            1,
-                            'Profile'.tr,
-                            iconAddress: "packages/fclash/assets/images/文件.svg",
-                          ),
-                          _buildOptions(
-                            2,
-                            'Setting'.tr,
-                            iconAddress: "packages/fclash/assets/images/设置.svg",
-                          ),
-                          _buildOptions(
-                            3,
-                            'Connections'.tr,
-                            iconAddress: "packages/fclash/assets/images/连接.svg",
-                          ),
-                          _buildOptions(
-                            4,
-                            'Log'.tr,
-                            iconAddress: "packages/fclash/assets/images/日志.svg",
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
+                  Expanded(child: buildFrame()),
                 ],
               ),
-              Expanded(child: buildFrame()),
-            ],
-          ))
-        ],
-      )),
+            ),
+            const SizedBox(height: 15),
+          ],
+        ),
+      ),
     );
   }
 

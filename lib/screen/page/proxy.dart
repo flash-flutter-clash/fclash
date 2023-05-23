@@ -54,8 +54,10 @@ class _ProxyState extends State<Proxy> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Obx(() {
-                      trayManager.setTitle(
-                          " ↑${Get.find<ClashService>().downRate.value.toStringAsFixed(1)}KB/s\n ↓${Get.find<ClashService>().uploadRate.value.toStringAsFixed(1)}KB/s");
+                      if (isDesktop) {
+                        trayManager.setTitle(
+                            " ↑${Get.find<ClashService>().downRate.value.toStringAsFixed(1)}KB/s\n ↓${Get.find<ClashService>().uploadRate.value.toStringAsFixed(1)}KB/s");
+                      }
                       return Text(
                         "上传:${Get.find<ClashService>().downRate.value.toStringAsFixed(1)}KB/s  下载:${Get.find<ClashService>().uploadRate.value.toStringAsFixed(1)}KB/s",
                         style: TextStyle(

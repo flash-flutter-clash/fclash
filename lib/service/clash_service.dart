@@ -25,7 +25,7 @@ import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
 late NativeLibrary clashFFI;
-const mobileChannel = MethodChannel("FClashPlugin");
+const mobileChannel = MethodChannel("FlashPlugin");
 
 class ClashService extends GetxService with TrayListener {
   // 需要一起改端口

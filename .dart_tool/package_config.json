@@ -789,7 +789,7 @@
     },
     {
       "name": "tray_manager",
-      "rootUri": "../y_tray_manager",
+      "rootUri": "file:///Users/andy/.pub-cache/git/fclash-e4aea7afce67b34f11b7ce9cfaa4acc52dcdc4df/y_tray_manager",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -956,7 +956,7 @@
       "languageVersion": "2.16"
     }
   ],
-  "generated": "2023-05-24T09:39:16.891082Z",
+  "generated": "2023-05-24T09:52:25.717987Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }

@@ -36,8 +36,13 @@ dependencies:
   yaml_writer: ^1.0.3
   flutter_svg: ^2.0.2
 
+  # tray_manager:
+  #   path: ./y_tray_manager
   tray_manager:
-    path: ./y_tray_manager
+    git:
+      url: https://github.com/flash-flutter-clash/fclash.git
+      path: y_tray_manager
+      ref: develop
 
 dev_dependencies:
   flutter_test:

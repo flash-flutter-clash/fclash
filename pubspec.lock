@@ -1038,8 +1038,10 @@ packages:
     dependency: "direct main"
     description:
       path: y_tray_manager
-      relative: true
-    source: path
+      ref: develop
+      resolved-ref: e4aea7afce67b34f11b7ce9cfaa4acc52dcdc4df
+      url: "https://github.com/flash-flutter-clash/fclash.git"
+    source: git
     version: "0.2.0"
   typed_data:
     dependency: transitive

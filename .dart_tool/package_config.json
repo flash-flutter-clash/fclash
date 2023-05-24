@@ -789,7 +789,7 @@
     },
     {
       "name": "tray_manager",
-      "rootUri": "file:///Users/andy/.pub-cache/hosted/pub.dev/tray_manager-0.2.0",
+      "rootUri": "../y_tray_manager",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -956,7 +956,7 @@
       "languageVersion": "2.16"
     }
   ],
-  "generated": "2023-05-22T07:11:55.677258Z",
+  "generated": "2023-05-24T09:39:16.891082Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }

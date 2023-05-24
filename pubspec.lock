@@ -1037,10 +1037,9 @@ packages:
   tray_manager:
     dependency: "direct main"
     description:
-      name: tray_manager
-      sha256: b1975a05e0c6999e983cf9a58a6a098318c896040ccebac5398a3cc9e43b9c69
-      url: "https://pub.dev"
-    source: hosted
+      path: y_tray_manager
+      relative: true
+    source: path
     version: "0.2.0"
   typed_data:
     dependency: transitive

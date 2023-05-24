@@ -502,10 +502,6 @@ timezone
 2.12
 file:///Users/andy/.pub-cache/hosted/pub.dev/timezone-0.8.0/
 file:///Users/andy/.pub-cache/hosted/pub.dev/timezone-0.8.0/lib/
-tray_manager
-2.12
-file:///Users/andy/.pub-cache/hosted/pub.dev/tray_manager-0.2.0/
-file:///Users/andy/.pub-cache/hosted/pub.dev/tray_manager-0.2.0/lib/
 typed_data
 2.17
 file:///Users/andy/.pub-cache/hosted/pub.dev/typed_data-1.3.2/
@@ -614,6 +610,10 @@ fclash
 2.16
 file:///Users/andy/Documents/githubWorkplace/fclash/
 file:///Users/andy/Documents/githubWorkplace/fclash/lib/
+tray_manager
+2.12
+file:///Users/andy/Documents/githubWorkplace/fclash/y_tray_manager/
+file:///Users/andy/Documents/githubWorkplace/fclash/y_tray_manager/lib/
 sky_engine
 2.12
 file:///Users/andy/flutter/bin/cache/pkg/sky_engine/

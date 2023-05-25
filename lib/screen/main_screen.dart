@@ -171,7 +171,9 @@ class _MainScreenState extends State<MainScreen>
       child: Scaffold(
         body: Column(
           children: [
-            // buildDesktopOptions(),
+            Platform.isWindows
+                ? buildDesktopOptions()
+                : const SizedBox(height: 0),
             const SizedBox(height: 30),
             Expanded(
               child: Row(

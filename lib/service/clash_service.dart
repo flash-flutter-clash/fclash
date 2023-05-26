@@ -478,9 +478,9 @@ class ClashService extends GetxService with TrayListener {
     }
   }
 
-  void updateTray() {
+  List<MenuItem> updateTray() {
     if (!isDesktop) {
-      return;
+      return [];
     }
     final stringList = List<MenuItem>.empty(growable: true);
     // yaml
@@ -524,7 +524,8 @@ class ClashService extends GetxService with TrayListener {
           key: ACTION_UNSET_SYSTEM_PROXY));
       stringList.add(MenuItem.separator());
     }
-    initAppTray(details: stringList, isUpdate: true);
+
+    return stringList;
   }
 
   @override

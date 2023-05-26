@@ -20,14 +20,13 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:proxy_manager/proxy_manager.dart';
 import 'package:system_proxy/system_proxy.dart';
-import 'package:tray_manager/tray_manager.dart';
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
 late NativeLibrary clashFFI;
 const mobileChannel = MethodChannel("FlashPlugin");
 
-class ClashService extends GetxService with TrayListener {
+class ClashService extends GetxService {
   // 需要一起改端口
   static const clashBaseUrl = "http://127.0.0.1:$clashExtPort";
   static const clashExtPort = 22345;
@@ -126,9 +125,9 @@ class ClashService extends GetxService with TrayListener {
       initDaemon();
     });
     // tray show issue
-    if (isDesktop) {
-      trayManager.addListener(this);
-    }
+    // if (isDesktop) {
+    //   trayManager.addListener(this);
+    // }
     // wait getx initialize
     Future.delayed(const Duration(seconds: 3), () {
       if (!Platform.isWindows) {
@@ -178,7 +177,7 @@ class ClashService extends GetxService with TrayListener {
     getCurrentClashConfig();
     // proxies
     getProxies();
-    updateTray();
+    // updateTray();
   }
 
   // Future<bool> isRunning() async {
@@ -478,71 +477,21 @@ class ClashService extends GetxService with TrayListener {
     }
   }
 
-  List<MenuItem> updateTray() {
-    if (!isDesktop) {
-      return [];
-    }
-    final stringList = List<MenuItem>.empty(growable: true);
-    // yaml
-    stringList
-        .add(MenuItem(label: "profile: ${currentYaml.value}", disabled: true));
-    if (proxies['proxies'] != null) {
-      Map<String, dynamic> m = proxies['proxies'];
-      // m.removeWhere((key, value) => value['type'] != "Selector");
-      var cnt = 0;
-      for (final k in m.keys) {
-        if (cnt >= ClashService.MAX_ENTRIES) {
-          stringList.add(MenuItem(label: "...", disabled: true));
-          break;
-        }
-        stringList.add(
-            MenuItem(label: "${m[k]['name']}: ${m[k]['now']}", disabled: true));
-        cnt += 1;
-      }
-    }
-    // port
-    if (configEntity.value != null) {
-      stringList.add(
-          MenuItem(label: 'http: ${configEntity.value?.port}', disabled: true));
-      stringList.add(MenuItem(
-          label: 'socks: ${configEntity.value?.socksPort}', disabled: true));
-    }
-    // system proxy
-    stringList.add(MenuItem.separator());
-    if (!isSystemProxy()) {
-      stringList
-          .add(MenuItem(label: "Not system proxy yet.".tr, disabled: true));
-      stringList.add(MenuItem(
-          label: "Set as system proxy".tr,
-          toolTip: "click to set fclash as system proxy".tr,
-          key: ACTION_SET_SYSTEM_PROXY));
-    } else {
-      stringList.add(MenuItem(label: "System proxy now.".tr, disabled: true));
-      stringList.add(MenuItem(
-          label: "Unset system proxy".tr,
-          toolTip: "click to reset system proxy",
-          key: ACTION_UNSET_SYSTEM_PROXY));
-      stringList.add(MenuItem.separator());
-    }
-
-    return stringList;
-  }
-
-  @override
-  void onTrayMenuItemClick(MenuItem menuItem) {
-    switch (menuItem.key) {
-      case ACTION_SET_SYSTEM_PROXY:
-        setSystemProxy().then((value) {
-          reload();
-        });
-        break;
-      case ACTION_UNSET_SYSTEM_PROXY:
-        clearSystemProxy().then((_) {
-          reload();
-        });
-        break;
-    }
-  }
+  // @override
+  // void onTrayMenuItemClick(MenuItem menuItem) {
+  //   switch (menuItem.key) {
+  //     case ACTION_SET_SYSTEM_PROXY:
+  //       setSystemProxy().then((value) {
+  //         reload();
+  //       });
+  //       break;
+  //     case ACTION_UNSET_SYSTEM_PROXY:
+  //       clearSystemProxy().then((_) {
+  //         reload();
+  //       });
+  //       break;
+  //   }
+  // }
 
   Future<bool> addProfile(String name, String url) async {
     final configName = '$name.yaml';
@@ -561,7 +510,7 @@ class ClashService extends GetxService with TrayListener {
       });
       return resp.statusCode == 200;
     } catch (e) {
-      BrnToast.show("Error: ${e}", Get.context!);
+      // BrnToast.show("Error: ${e}", Get.context!);
     } finally {
       final f = File(newProfilePath);
       if (f.existsSync() && await changeYaml(f)) {
@@ -595,7 +544,7 @@ class ClashService extends GetxService with TrayListener {
       if (configEntity.value!.socksPort == 0) {
         changeConfigField('socks-port', initializedSockPort);
       }
-      updateTray();
+      // updateTray();
     }
   }
 

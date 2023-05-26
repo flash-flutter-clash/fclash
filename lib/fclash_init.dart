@@ -1,12 +1,11 @@
 import 'dart:io';
 
-import 'package:fclash/screen/controller/theme_controller.dart';
+// import 'package:fclash/screen/controller/theme_controller.dart';
 import 'package:fclash/service/autostart_service.dart';
 import 'package:fclash/service/clash_service.dart';
 import 'package:fclash/service/notification_service.dart';
 import 'package:kommon/kommon.dart';
 import 'package:proxy_manager/proxy_manager.dart';
-import 'package:tray_manager/tray_manager.dart';
 
 final proxyManager = ProxyManager();
 final isDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
@@ -22,7 +21,6 @@ Future<void> initFclashService({configFileUrl, configFileName}) async {
   if (isDesktop) {
     await Get.putAsync(() => AutostartService().init());
   }
-  Get.put(ThemeController());
   configName = configFileName;
   configUrl = configFileUrl;
   Get.find<ClashService>().addProfile(configFileName, configFileUrl);

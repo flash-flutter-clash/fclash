@@ -90,22 +90,20 @@ class ClashService extends GetxService {
     // kill all other clash clients
     final clashConfigPath = p.join(_clashDirectory.path, "clash");
     _clashDirectory = Directory(clashConfigPath);
-    print("fclash work directory: ${_clashDirectory.path}");
+    print("flash work directory: ${_clashDirectory.path}");
     final clashConf = p.join(_clashDirectory.path, currentYaml.value);
     final countryMMdb = p.join(_clashDirectory.path, 'Country.mmdb');
     if (!await _clashDirectory.exists()) {
       await _clashDirectory.create(recursive: true);
     }
     // copy executable to directory
-    final mmdb =
-        await rootBundle.load('packages/fclash/assets/tp/clash/Country.mmdb');
+    final mmdb = await rootBundle.load('assets/tp/clash/Country.mmdb');
     // write to clash dir
     final mmdbF = File(countryMMdb);
     if (!mmdbF.existsSync()) {
       await mmdbF.writeAsBytes(mmdb.buffer.asInt8List());
     }
-    final config =
-        await rootBundle.load('packages/fclash/assets/tp/clash/config.yaml');
+    final config = await rootBundle.load('assets/tp/clash/config.yaml');
     // write to clash dir
     final configF = File(clashConf);
     if (!configF.existsSync()) {
@@ -124,10 +122,7 @@ class ClashService extends GetxService {
     Future.delayed(Duration.zero, () {
       initDaemon();
     });
-    // tray show issue
-    // if (isDesktop) {
-    //   trayManager.addListener(this);
-    // }
+
     // wait getx initialize
     Future.delayed(const Duration(seconds: 3), () {
       if (!Platform.isWindows) {
@@ -168,7 +163,6 @@ class ClashService extends GetxService {
   void getCurrentClashConfig() {
     configEntity.value = ClashConfigEntity.fromJson(
         json.decode(clashFFI.get_configs().cast<Utf8>().toDartString()));
-    print("00000000");
   }
 
   Future<void> reload() async {
@@ -177,7 +171,12 @@ class ClashService extends GetxService {
     getCurrentClashConfig();
     // proxies
     getProxies();
-    // updateTray();
+  }
+
+  Future<void> reload2() async {
+    getCurrentClashConfig();
+    // proxies
+    getProxies();
   }
 
   // Future<bool> isRunning() async {
@@ -222,7 +221,7 @@ class ClashService extends GetxService {
     await reload();
     checkPort();
     if (isSystemProxy()) {
-      // setSystemProxy();
+      setSystemProxy();
     }
   }
 
@@ -354,12 +353,12 @@ class ClashService extends GetxService {
       if (configEntity.value != null) {
         final entity = configEntity.value!;
         if (entity.port != 0) {
-          // await Future.wait([
-          await proxyManager.setAsSystemProxy(
-              ProxyTypes.http, '127.0.0.1', entity.port!);
-          await proxyManager.setAsSystemProxy(
-              ProxyTypes.https, '127.0.0.1', entity.port!);
-          // ]);
+          await Future.wait([
+            proxyManager.setAsSystemProxy(
+                ProxyTypes.http, '127.0.0.1', entity.port!),
+            proxyManager.setAsSystemProxy(
+                ProxyTypes.https, '127.0.0.1', entity.port!)
+          ]);
           debugPrint("set http");
         }
         if (entity.socksPort != 0 && !Platform.isWindows) {
@@ -373,9 +372,8 @@ class ClashService extends GetxService {
       if (configEntity.value != null) {
         final entity = configEntity.value!;
         if (entity.port != 0) {
-          final result = await mobileChannel
+          await mobileChannel
               .invokeMethod("SetHttpPort", {"port": entity.port});
-          print(result);
         }
         mobileChannel.invokeMethod("StartProxy");
         await setIsSystemProxy(true);
@@ -477,22 +475,6 @@ class ClashService extends GetxService {
     }
   }
 
-  // @override
-  // void onTrayMenuItemClick(MenuItem menuItem) {
-  //   switch (menuItem.key) {
-  //     case ACTION_SET_SYSTEM_PROXY:
-  //       setSystemProxy().then((value) {
-  //         reload();
-  //       });
-  //       break;
-  //     case ACTION_UNSET_SYSTEM_PROXY:
-  //       clearSystemProxy().then((_) {
-  //         reload();
-  //       });
-  //       break;
-  //   }
-  // }
-
   Future<bool> addProfile(String name, String url) async {
     final configName = '$name.yaml';
     final newProfilePath = join(_clashDirectory.path, configName);
@@ -510,7 +492,7 @@ class ClashService extends GetxService {
       });
       return resp.statusCode == 200;
     } catch (e) {
-      // BrnToast.show("Error: ${e}", Get.context!);
+      BrnToast.show("Error: ${e}", Get.context!);
     } finally {
       final f = File(newProfilePath);
       if (f.existsSync() && await changeYaml(f)) {
@@ -544,7 +526,6 @@ class ClashService extends GetxService {
       if (configEntity.value!.socksPort == 0) {
         changeConfigField('socks-port', initializedSockPort);
       }
-      // updateTray();
     }
   }
 

@@ -10,9 +10,6 @@ import 'package:proxy_manager/proxy_manager.dart';
 final proxyManager = ProxyManager();
 final isDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
 
-String configName = "";
-String configUrl = "";
-
 Future<void> initFclashService(String configFileUrl,
     {String configFileName = "configNew"}) async {
   await SpUtil.getInstance();
@@ -22,9 +19,6 @@ Future<void> initFclashService(String configFileUrl,
   if (isDesktop) {
     await Get.putAsync(() => AutostartService().init());
   }
-  configName = configFileName;
-  configUrl = configFileUrl;
-
   // 配置
   await Get.find<ClashService>().addProfile(configFileName, configFileUrl);
 }

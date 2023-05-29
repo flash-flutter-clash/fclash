@@ -495,7 +495,8 @@ class ClashService extends GetxService {
       });
       return resp.statusCode == 200;
     } catch (e) {
-      BrnToast.show("Error: ${e}", Get.context!);
+      print(e);
+      // BrnToast.show("Error: ${e}", Get.context!);
     } finally {
       final f = File(newProfilePath);
       if (f.existsSync() && await changeYaml(f)) {

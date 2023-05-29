@@ -478,6 +478,9 @@ class ClashService extends GetxService {
   Future<bool> addProfile(String name, String url) async {
     final configName = '$name.yaml';
     final newProfilePath = join(_clashDirectory.path, configName);
+    File configFile = File(newProfilePath);
+
+    deleteProfile(configFile);
     try {
       final uri = Uri.tryParse(url);
       if (uri == null) {
@@ -704,7 +707,7 @@ Future<String> convertConfig(String content) async {
       //     return content;
       //   }
       // }
-      BrnLoadingDialog.show(Get.overlayContext!);
+      // BrnLoadingDialog.show(Get.overlayContext!);
       Map providers = doc['rule-providers'];
       final total = providers.keys.length;
       final index = 0.obs;
@@ -797,6 +800,6 @@ Future<String> convertConfig(String content) async {
     // ignore
     return "";
   } finally {
-    BrnLoadingDialog.dismiss(Get.overlayContext!);
+    // BrnLoadingDialog.dismiss(Get.overlayContext!);
   }
 }

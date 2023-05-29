@@ -13,7 +13,8 @@ final isDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
 String configName = "";
 String configUrl = "";
 
-Future<void> initFclashService({configFileUrl, configFileName}) async {
+Future<void> initFclashService(Required String configFileUrl,
+    {String configFileName = "configNew"}) async {
   await SpUtil.getInstance();
   await Get.putAsync(() => NotificationService().init());
   await Get.putAsync(() => ClashService().init());
@@ -23,5 +24,17 @@ Future<void> initFclashService({configFileUrl, configFileName}) async {
   }
   configName = configFileName;
   configUrl = configFileUrl;
-  Get.find<ClashService>().addProfile(configFileName, configFileUrl);
+
+  // 配置
+  await Get.find<ClashService>().addProfile(configFileName, configFileUrl);
+
+  // 设置为系统代理：开启vpn
+  await startVPN();
 }
+
+Future<void> startVPN(){
+  // 设置为系统代理：开启vpn
+  await Get.find<ClashService>().setSystemProxy();
+}
+
+

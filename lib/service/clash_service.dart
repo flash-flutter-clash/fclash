@@ -68,7 +68,10 @@ class ClashService extends GetxService {
     } else if (Platform.isMacOS) {
       fullPath = "libclash.dylib";
     } else if (Platform.isIOS) {
-      fullPath = "demo.dylib";
+      final lib = ffi.DynamicLibrary.executable();
+      clashFFI = NativeLibrary(lib);
+      clashFFI.init_native_api_bridge(ffi.NativeApi.initializeApiDLData);
+      return;
     } else {
       fullPath = "libclash.so";
     }
@@ -113,7 +116,7 @@ class ClashService extends GetxService {
     await _acquireLock(_clashDirectory);
     // ffi
     clashFFI.set_home_dir(_clashDirectory.path.toNativeUtf8().cast());
-    clashFFI.clash_init(_clashDirectory.path.toNativeUtf8().cast());
+    clashFFI.clash_init(_clashDirectory.path);
     clashFFI.set_config(clashConf.toNativeUtf8().cast());
     clashFFI.set_ext_controller(clashExtPort);
     if (clashFFI.parse_options() == 0) {

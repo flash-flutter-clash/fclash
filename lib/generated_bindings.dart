@@ -1006,11 +1006,11 @@ class NativeLibrary {
   Future<void> init_native_api_bridge(
     ffi.Pointer<ffi.Void> api,
   ) async {
-    if (Platform.isIOS) {
-      print("flutter init_native_api_bridge:${api}");
-      return await mobileChannel
-          .invokeMethod("init_native_api_bridge", {"address": api.address});
-    }
+    // if (Platform.isIOS) {
+    //   print("flutter init_native_api_bridge:${api}");
+    //   return await mobileChannel
+    //       .invokeMethod("init_native_api_bridge", {"address": api.address});
+    // }
     return _init_native_api_bridge(
       api,
     );

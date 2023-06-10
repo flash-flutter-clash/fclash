@@ -329,7 +329,7 @@ class ClashService extends GetxService {
     return ret == 0;
   }
 
-  bool changeConfigField(String field, dynamic value) {
+  Future<bool> changeConfigField(String field, dynamic value) async {
     try {
       int ret = clashFFI.change_config_field(
           json.encode(<String, dynamic>{field: value}).toNativeUtf8().cast());
@@ -337,7 +337,10 @@ class ClashService extends GetxService {
     } finally {
       getCurrentClashConfig();
       if (field.endsWith("port") && isSystemProxy()) {
-        setSystemProxy();
+        await clearSystemProxy();
+        Future.delayed(Duration(seconds: 1), () {
+          setSystemProxy();
+        });
       }
     }
   }

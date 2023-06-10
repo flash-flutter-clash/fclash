@@ -374,9 +374,9 @@ class ClashService extends GetxService {
     } else {
       if (configEntity.value != null) {
         final entity = configEntity.value!;
-        if (entity.port != 0) {
+        if (entity.mixedPort != 0) {
           await mobileChannel
-              .invokeMethod("SetHttpPort", {"port": entity.port});
+              .invokeMethod("SetHttpPort", {"port": entity.mixedPort});
         }
         mobileChannel.invokeMethod("StartProxy");
         await setIsSystemProxy(true);

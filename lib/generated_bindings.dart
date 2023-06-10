@@ -859,13 +859,13 @@ class NativeLibrary {
   late final __FCmulcr =
       __FCmulcrPtr.asFunction<_Fcomplex Function(_Fcomplex, double)>();
 
-  Future<int> clash_init(
+  int clash_init(
     String home_dir,
-  ) async {
-    if (Platform.isIOS) {
-      return await mobileChannel
-          .invokeMethod("clash_init", {"home_dir": home_dir});
-    }
+  ) {
+    // if (Platform.isIOS) {
+    //   return await mobileChannel
+    //       .invokeMethod("clash_init", {"home_dir": home_dir});
+    // }
     return _clash_init(
       home_dir.toNativeUtf8().cast(),
     );

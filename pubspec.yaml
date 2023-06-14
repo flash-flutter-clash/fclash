@@ -35,6 +35,8 @@ dependencies:
   yaml: ^3.1.1
   yaml_writer: ^1.0.3
   flutter_svg: ^2.0.2
+  get_event_bus: 1.0.0
+
 
 dev_dependencies:
   flutter_test:

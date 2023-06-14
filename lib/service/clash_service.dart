@@ -14,6 +14,7 @@ import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter/services.dart';
+import 'package:get_event_bus/get_event_bus.dart';
 import 'package:kommon/kommon.dart' hide ProxyTypes;
 import 'package:path/path.dart';
 import 'package:path/path.dart' as p;
@@ -203,8 +204,8 @@ class ClashService extends GetxService {
     //   await Future.delayed(const Duration(milliseconds: 500));
     // }
     // get traffic
-    Timer.periodic(const Duration(seconds: 1), (t) {
-      final traffic = clashFFI.get_traffic().cast<Utf8>().toDartString();
+    Timer.periodic(const Duration(seconds: 1), (t) async {
+      final traffic = await clashFFI.get_traffic();
       if (kDebugMode) {
         debugPrint("$traffic");
       }
@@ -385,6 +386,7 @@ class ClashService extends GetxService {
         mobileChannel.invokeMethod("StartProxy");
         await setIsSystemProxy(true);
       }
+      Get.bus.fire("ClashVPNStatusChanged");
 
       // await Clipboard.setData(
       //     ClipboardData(text: "${configEntity.value?.port}"));
@@ -442,6 +444,8 @@ class ClashService extends GetxService {
     } else {
       mobileChannel.invokeMethod("StopProxy");
       await setIsSystemProxy(false);
+      Get.bus.fire("ClashVPNStatusChanged");
+
       // final dialog = BrnDialog(
       //   titleText: "请手动设置代理",
       //   messageText: "请进入已连接WiFi的详情设置，将代理设置为无",
@@ -509,6 +513,7 @@ class ClashService extends GetxService {
       if (f.existsSync() && await changeYaml(f)) {
         // set subscription
         await SpUtil.setData('profile_$name', url);
+        Get.bus.fire("ClashProvileUpdate");
         return true;
       }
       return false;

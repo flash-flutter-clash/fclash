@@ -993,8 +993,12 @@ class NativeLibrary {
       _lookup<ffi.NativeFunction<GoUint8 Function()>>('parse_options');
   late final _parse_options = _parse_optionsPtr.asFunction<int Function()>();
 
-  ffi.Pointer<ffi.Char> get_traffic() {
-    return _get_traffic();
+  Future<String> get_traffic() async {
+    if (Platform.isIOS) {
+      var result = await mobileChannel.invokeMethod("get_traffic") as String?;
+      return result ?? "{\"Up\":0,\"Down\":0}";
+    }
+    return _get_traffic().cast<Utf8>().toDartString();
   }
 
   late final _get_trafficPtr =

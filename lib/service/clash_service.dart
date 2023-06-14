@@ -293,6 +293,7 @@ class ClashService extends GetxService {
           queryParameters: {"force": false}, data: {"path": config.path});
       Get.printInfo(info: 'config changed ret: ${resp.statusCode}');
       currentYaml.value = basename(config.path);
+      clashFFI.set_config(config.path.toNativeUtf8().cast());
       SpUtil.setData('yaml', currentYaml.value);
       return resp.statusCode == 204;
     } else {

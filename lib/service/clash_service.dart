@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:isolate';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:fclash/bean/clash_config_entity.dart';
@@ -12,7 +11,6 @@ import 'package:fclash/generated_bindings.dart';
 import 'package:fclash/service/notification_service.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter/services.dart';
 import 'package:get_event_bus/get_event_bus.dart';
 import 'package:kommon/kommon.dart' hide ProxyTypes;
@@ -20,7 +18,6 @@ import 'package:path/path.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:proxy_manager/proxy_manager.dart';
-import 'package:system_proxy/system_proxy.dart';
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
@@ -499,8 +496,8 @@ class ClashService extends GetxService {
       }
       final resp = await Dio(BaseOptions(
               headers: {'User-Agent': 'Fclash'},
-              sendTimeout: 15000,
-              receiveTimeout: 15000))
+              sendTimeout: const Duration(milliseconds: 15000),
+              receiveTimeout: const Duration(milliseconds: 15000)))
           .downloadUri(uri, newProfilePath, onReceiveProgress: (i, t) {
         Get.printInfo(info: "$i/$t");
       });
@@ -617,8 +614,8 @@ class ClashService extends GetxService {
 
       final resp = await Dio(BaseOptions(
               headers: {'User-Agent': 'Fclash'},
-              sendTimeout: 15000,
-              receiveTimeout: 15000))
+              sendTimeout: const Duration(milliseconds: 15000),
+              receiveTimeout: const Duration(milliseconds: 15000)))
           .downloadUri(uri, tmpF.path, onReceiveProgress: (i, t) {
         Get.printInfo(info: "$i/$t");
       }).catchError((e) {

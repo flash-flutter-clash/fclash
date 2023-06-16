@@ -18,7 +18,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   kommon:
-    path: ../kommon-flutter
+    git:
+      url: git@github.com:flash-flutter-clash/kommon-flutter.git
+  #    path: ../kommon-flutter
   path: ^1.8.0
   path_provider: ^2.0.9
   window_manager: ^0.3.0

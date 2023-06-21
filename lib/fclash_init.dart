@@ -11,7 +11,7 @@ final proxyManager = ProxyManager();
 final isDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
 
 Future<void> initFclashService(String configFileUrl,
-    {String configFileName = "configNew"}) async {
+    {String configFileName = "configNew", String token = ''}) async {
   await SpUtil.getInstance();
   await Get.putAsync(() => NotificationService().init());
   await Get.putAsync(() => ClashService().init());
@@ -21,7 +21,8 @@ Future<void> initFclashService(String configFileUrl,
   }
   // 配置
   if (configFileUrl.isNotEmpty) {
-    await Get.find<ClashService>().addProfile(configFileName, configFileUrl);
+    await Get.find<ClashService>()
+        .addProfile(configFileName, configFileUrl, token);
   }
 }
 

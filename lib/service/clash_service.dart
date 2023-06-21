@@ -483,7 +483,7 @@ class ClashService extends GetxService {
     }
   }
 
-  Future<bool> addProfile(String name, String url) async {
+  Future<bool> addProfile(String name, String url, String token) async {
     final configName = '$name.yaml';
     final newProfilePath = join(_clashDirectory.path, configName);
     File configFile = File(newProfilePath);
@@ -495,7 +495,10 @@ class ClashService extends GetxService {
         return false;
       }
       final resp = await Dio(BaseOptions(
-              headers: {'User-Agent': 'Fclash'},
+              headers: {
+            'User-Agent': 'Fclash',
+            'Authorization': token,
+          },
               sendTimeout: const Duration(milliseconds: 15000),
               receiveTimeout: const Duration(milliseconds: 15000)))
           .downloadUri(uri, newProfilePath, onReceiveProgress: (i, t) {
@@ -511,6 +514,7 @@ class ClashService extends GetxService {
         // set subscription
         await SpUtil.setData('profile_$name', url);
         Get.bus.fire("ClashProvileUpdate");
+        debugPrint('===============addProfile success');
         return true;
       }
       return false;

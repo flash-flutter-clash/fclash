@@ -330,8 +330,8 @@ class ClashService extends GetxService {
 
   Future<bool> changeConfigField(String field, dynamic value) async {
     try {
-      int ret = clashFFI.change_config_field(
-          json.encode(<String, dynamic>{field: value}).toNativeUtf8().cast());
+      var jsonString = json.encode(<String, dynamic>{field: value});
+      int ret = await clashFFI.change_config_field(jsonString);
       return ret == 0;
     } finally {
       getCurrentClashConfig();

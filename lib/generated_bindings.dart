@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:ffi/ffi.dart';
 
 import 'package:fclash/service/clash_service.dart';
+import 'package:flutter/foundation.dart';
 
 class NativeLibrary {
   /// Holds the symbol lookup function.
@@ -1063,12 +1064,16 @@ class NativeLibrary {
   late final _change_proxy = _change_proxyPtr
       .asFunction<int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
-  int change_config_field(
-    ffi.Pointer<ffi.Char> s,
-  ) {
-    return _change_config_field(
-      s,
+  Future<int> change_config_field(
+    String s,
+  ) async {
+    var result = _change_config_field(
+      s.toNativeUtf8().cast(),
     );
+    if (Platform.isIOS) {
+      await mobileChannel.invokeMethod("change_config_field", s);
+    }
+    return result;
   }
 
   late final _change_config_fieldPtr =

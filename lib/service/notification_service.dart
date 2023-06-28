@@ -10,7 +10,10 @@ class NotificationService extends GetxService {
     await notification.initialize(const InitializationSettings(
         linux: LinuxInitializationSettings(defaultActionName: 'act'),
         macOS: MacOSInitializationSettings(),
-        iOS: null,
+        iOS: IOSInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false),
         android: AndroidInitializationSettings("fclash")));
     return this;
   }

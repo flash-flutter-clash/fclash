@@ -1011,11 +1011,6 @@ class NativeLibrary {
   Future<void> init_native_api_bridge(
     ffi.Pointer<ffi.Void> api,
   ) async {
-    // if (Platform.isIOS) {
-    //   print("flutter init_native_api_bridge:${api}");
-    //   return await mobileChannel
-    //       .invokeMethod("init_native_api_bridge", {"address": api.address});
-    // }
     return _init_native_api_bridge(
       api,
     );
@@ -1047,13 +1042,18 @@ class NativeLibrary {
       _lookup<ffi.NativeFunction<ffi.Void Function()>>('stop_log');
   late final _stop_log = _stop_logPtr.asFunction<void Function()>();
 
-  int change_proxy(
-    ffi.Pointer<ffi.Char> selector_name,
-    ffi.Pointer<ffi.Char> proxy_name,
-  ) {
+  Future<int> change_proxy(
+    String selector_name,
+    String proxy_name,
+  ) async {
+    if (Platform.isIOS) {
+      var result = await mobileChannel.invokeMethod("change_proxy",
+          {"selector_name": selector_name, "proxy_name": proxy_name}) as bool?;
+      return result == true ? 0 : -1;
+    }
     return _change_proxy(
-      selector_name,
-      proxy_name,
+      selector_name.toNativeUtf8().cast(),
+      proxy_name.toNativeUtf8().cast(),
     );
   }
 

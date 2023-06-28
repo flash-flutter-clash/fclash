@@ -205,9 +205,7 @@ class ClashService extends GetxService {
     // get traffic
     Timer.periodic(const Duration(seconds: 1), (t) async {
       final traffic = await clashFFI.get_traffic();
-      if (kDebugMode) {
-        debugPrint("$traffic");
-      }
+
       try {
         final trafficJson = jsonDecode(traffic);
         uploadRate.value = trafficJson['Up'].toDouble() / 1024; // KB
@@ -321,9 +319,8 @@ class ClashService extends GetxService {
     }
   }
 
-  bool changeProxy(String selectName, String proxyName) {
-    final ret = clashFFI.change_proxy(
-        selectName.toNativeUtf8().cast(), proxyName.toNativeUtf8().cast());
+  Future<bool> changeProxy(String selectName, String proxyName) async {
+    final ret = await clashFFI.change_proxy(selectName, proxyName);
     if (ret == 0) {
       reload();
     }

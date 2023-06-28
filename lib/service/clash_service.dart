@@ -5,6 +5,8 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
+
 import 'package:fclash/bean/clash_config_entity.dart';
 import 'package:fclash/fclash_init.dart';
 import 'package:fclash/generated_bindings.dart';
@@ -494,14 +496,25 @@ class ClashService extends GetxService {
       if (uri == null) {
         return false;
       }
-      final resp = await Dio(BaseOptions(
-              headers: {
+      var dio = Dio(BaseOptions(
+          headers: {
             'User-Agent': 'Fclash',
             'Authorization': token,
           },
-              sendTimeout: const Duration(milliseconds: 15000),
-              receiveTimeout: const Duration(milliseconds: 15000)))
-          .downloadUri(uri, newProfilePath, onReceiveProgress: (i, t) {
+          sendTimeout: const Duration(milliseconds: 15000),
+          receiveTimeout: const Duration(milliseconds: 15000)));
+
+      // dio.httpClientAdapter = IOHttpClientAdapter(
+      //   createHttpClient: () {
+      //     final client = HttpClient();
+      //     client.findProxy = (uri) {
+      //       return 'PROXY 192.168.2.77:8888';
+      //     };
+      //     return client;
+      //   },
+      // );
+      final resp =
+          await dio.downloadUri(uri, newProfilePath, onReceiveProgress: (i, t) {
         Get.printInfo(info: "$i/$t");
       });
       return resp.statusCode == 200;

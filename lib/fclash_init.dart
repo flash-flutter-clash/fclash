@@ -27,8 +27,8 @@ Future<void> initFclashService(String configFileUrl,
 }
 
 // 设置为系统代理：开启vpn
-Future<void> startVPN() async {
-  await Get.find<ClashService>().setSystemProxy();
+Future<bool> startVPN() async {
+  return await Get.find<ClashService>().setSystemProxy();
 }
 
 // 关闭系统代理

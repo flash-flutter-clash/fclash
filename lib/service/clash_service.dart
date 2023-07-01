@@ -5,8 +5,6 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
-
 import 'package:fclash/bean/clash_config_entity.dart';
 import 'package:fclash/fclash_init.dart';
 import 'package:fclash/generated_bindings.dart';
@@ -203,20 +201,22 @@ class ClashService extends GetxService {
     //   await Future.delayed(const Duration(milliseconds: 500));
     // }
     // get traffic
-    Timer.periodic(const Duration(seconds: 1), (t) async {
-      final traffic = await clashFFI.get_traffic();
-
-      try {
-        final trafficJson = jsonDecode(traffic);
-        uploadRate.value = trafficJson['Up'].toDouble() / 1024; // KB
-        downRate.value = trafficJson['Down'].toDouble() / 1024; // KB
-        // fix: 只有KDE不会导致Tray自动消失
-        // final desktop = Platform.environment['XDG_CURRENT_DESKTOP'];
-        // updateTray();
-      } catch (e) {
-        Get.printError(info: '$e');
-      }
-    });
+    // Timer.periodic(const Duration(seconds: 1), (t) async {
+    //   final traffic = await clashFFI.get_traffic();
+    //   if (kDebugMode) {
+    //     // debugPrint("$traffic");
+    //   }
+    //   try {
+    //     final trafficJson = jsonDecode(traffic);
+    //     uploadRate.value = trafficJson['Up'].toDouble() / 1024; // KB
+    //     downRate.value = trafficJson['Down'].toDouble() / 1024; // KB
+    //     // fix: 只有KDE不会导致Tray自动消失
+    //     // final desktop = Platform.environment['XDG_CURRENT_DESKTOP'];
+    //     // updateTray();
+    //   } catch (e) {
+    //     Get.printError(info: '$e');
+    //   }
+    // });
     // system proxy
     // listen port
     await reload();
@@ -352,7 +352,7 @@ class ClashService extends GetxService {
     return SpUtil.setData('system_proxy', proxy);
   }
 
-  Future<void> setSystemProxy() async {
+  Future<bool> setSystemProxy() async {
     if (isDesktop) {
       if (configEntity.value != null) {
         final entity = configEntity.value!;
@@ -371,7 +371,9 @@ class ClashService extends GetxService {
               ProxyTypes.socks, '127.0.0.1', entity.socksPort!);
         }
         await setIsSystemProxy(true);
+        return true;
       }
+      return false;
     } else {
       if (configEntity.value != null) {
         final entity = configEntity.value!;
@@ -379,10 +381,18 @@ class ClashService extends GetxService {
           await mobileChannel
               .invokeMethod("SetHttpPort", {"port": entity.mixedPort});
         }
-        mobileChannel.invokeMethod("StartProxy");
-        await setIsSystemProxy(true);
+        bool permission = await mobileChannel.invokeMethod("StartProxy");
+        print('permission:$permission');
+        if (permission) {
+          await setIsSystemProxy(true);
+          return true;
+        } else {
+          await setIsSystemProxy(false);
+          return false;
+        }
       }
       Get.bus.fire("ClashVPNStatusChanged");
+      return false;
 
       // await Clipboard.setData(
       //     ClipboardData(text: "${configEntity.value?.port}"));

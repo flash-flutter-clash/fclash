@@ -14,7 +14,7 @@ class NotificationService extends GetxService {
             requestAlertPermission: false,
             requestBadgePermission: false,
             requestSoundPermission: false),
-        android: AndroidInitializationSettings("fclash")));
+        android: AndroidInitializationSettings("orca")));
     return this;
   }
 
@@ -28,7 +28,6 @@ class NotificationService extends GetxService {
                 urgency: LinuxNotificationUrgency.normal),
             macOS: MacOSNotificationDetails(),
             iOS: IOSNotificationDetails(),
-            android:
-                AndroidNotificationDetails("cn.kingtous.fclash", "fclash")));
+            android: AndroidNotificationDetails("cn.kingtous.fclash", "orca")));
   }
 }

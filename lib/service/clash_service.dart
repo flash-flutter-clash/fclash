@@ -221,9 +221,9 @@ class ClashService extends GetxService {
     // listen port
     await reload();
     checkPort();
-    if (isSystemProxy()) {
-      setSystemProxy();
-    }
+    // if (isSystemProxy()) {
+    //   setSystemProxy();
+    // }
   }
 
   @override

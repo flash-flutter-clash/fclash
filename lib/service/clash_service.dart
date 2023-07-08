@@ -146,6 +146,10 @@ class ClashService extends GetxService {
     }
   }
 
+  String get_config() {
+    return clashFFI.get_config().cast<Utf8>().toDartString();
+  }
+
   Map<String, dynamic> getConnections() {
     String connections =
         clashFFI.get_all_connections().cast<Utf8>().toDartString();
@@ -266,11 +270,11 @@ class ClashService extends GetxService {
   void startLogging() {
     final receiver = ReceivePort();
     logStream = receiver.asBroadcastStream();
-    if (kDebugMode) {
-      logStream?.listen((event) {
-        debugPrint("LOG: ${event}");
-      });
-    }
+    // if (kDebugMode) {
+    //   logStream?.listen((event) {
+    //     debugPrint("LOG: ${event}");
+    //   });
+    // }
     final nativePort = receiver.sendPort.nativePort;
     debugPrint("port: $nativePort");
     clashFFI.start_log(nativePort);

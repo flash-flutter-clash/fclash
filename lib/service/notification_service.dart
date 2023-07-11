@@ -28,6 +28,6 @@ class NotificationService extends GetxService {
                 urgency: LinuxNotificationUrgency.normal),
             macOS: MacOSNotificationDetails(),
             iOS: IOSNotificationDetails(),
-            android: AndroidNotificationDetails("cn.kingtous.fclash", "orca")));
+            android: AndroidNotificationDetails("com.orca.vpn.lite", "orca",icon: 'orca',largeIcon: DrawableResourceAndroidBitmap('orca'),)));
   }
 }

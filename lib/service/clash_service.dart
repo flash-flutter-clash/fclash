@@ -128,7 +128,7 @@ class ClashService extends GetxService {
     Future.delayed(const Duration(seconds: 3), () {
       if (!Platform.isWindows) {
         Get.find<NotificationService>()
-            .showNotification("Fclash", "Is running".tr);
+            .showNotification("OrcaVPN", "Is running".tr);
       }
     });
     return this;

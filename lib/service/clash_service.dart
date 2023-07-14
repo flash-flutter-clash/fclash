@@ -5,6 +5,8 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
+
 import 'package:fclash/bean/clash_config_entity.dart';
 import 'package:fclash/fclash_init.dart';
 import 'package:fclash/generated_bindings.dart';
@@ -496,7 +498,8 @@ class ClashService extends GetxService {
     }
   }
 
-  Future<bool> addProfile(String name, String url, String token) async {
+  Future<bool> addProfile(String name, String url, String token,
+      {bool adblock = false, bool website = false}) async {
     final configName = '$name.yaml';
     final newProfilePath = join(_clashDirectory.path, configName);
     File configFile = File(newProfilePath);
@@ -515,6 +518,8 @@ class ClashService extends GetxService {
           sendTimeout: const Duration(milliseconds: 15000),
           receiveTimeout: const Duration(milliseconds: 15000)));
 
+      Map params = {"adblock": adblock, "website": website};
+
       // dio.httpClientAdapter = IOHttpClientAdapter(
       //   createHttpClient: () {
       //     final client = HttpClient();
@@ -524,8 +529,8 @@ class ClashService extends GetxService {
       //     return client;
       //   },
       // );
-      final resp =
-          await dio.downloadUri(uri, newProfilePath, onReceiveProgress: (i, t) {
+      final resp = await dio.downloadUri(uri, newProfilePath, data: params,
+          onReceiveProgress: (i, t) {
         Get.printInfo(info: "$i/$t");
       });
       return resp.statusCode == 200;

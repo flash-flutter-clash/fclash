@@ -1046,7 +1046,7 @@ class NativeLibrary {
     String selector_name,
     String proxy_name,
   ) async {
-    if (Platform.isIOS) {
+    if (Platform.isIOS || Platform.isAndroid) {
       var result = await mobileChannel.invokeMethod("change_proxy",
           {"selector_name": selector_name, "proxy_name": proxy_name}) as bool?;
       return result == true ? 0 : -1;
@@ -1070,7 +1070,7 @@ class NativeLibrary {
     var result = _change_config_field(
       s.toNativeUtf8().cast(),
     );
-    if (Platform.isIOS) {
+    if (Platform.isIOS || Platform.isAndroid) {
       await mobileChannel.invokeMethod("change_config_field", s);
     }
     return result;

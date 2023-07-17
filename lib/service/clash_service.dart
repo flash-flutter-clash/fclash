@@ -73,7 +73,7 @@ class ClashService extends GetxService {
       clashFFI.init_native_api_bridge(ffi.NativeApi.initializeApiDLData);
       return;
     } else {
-      fullPath = "libclash.so";
+      fullPath = "libclashF.so";
     }
     final lib = ffi.DynamicLibrary.open(fullPath);
     clashFFI = NativeLibrary(lib);
@@ -542,6 +542,7 @@ class ClashService extends GetxService {
       if (f.existsSync() && await changeYaml(f)) {
         // set subscription
         await SpUtil.setData('profile_$name', url);
+        mobileChannel.invokeMethod("addProfileForAndroid",{"proFilePath": newProfilePath});
         Get.bus.fire("ClashProvileUpdate");
         debugPrint('===============addProfile success');
         return true;

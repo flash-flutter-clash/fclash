@@ -503,13 +503,22 @@ class ClashService extends GetxService {
     final configName = '$name.yaml';
     final newProfilePath = join(_clashDirectory.path, configName);
     File configFile = File(newProfilePath);
-
     deleteProfile(configFile);
     try {
+      final String adblockString = adblock ? "true" : "false";
+      final String websiteString = website ? "true" : "false";
+
+      Map<String, dynamic> params = {
+        "adblock": adblockString,
+        "website": websiteString
+      };
       final uri = Uri.tryParse(url);
       if (uri == null) {
         return false;
       }
+
+      final finalUri = uri.replace(queryParameters: params); //USE THIS
+
       var dio = Dio(BaseOptions(
           headers: {
             'User-Agent': 'Fclash',
@@ -518,18 +527,16 @@ class ClashService extends GetxService {
           sendTimeout: const Duration(milliseconds: 15000),
           receiveTimeout: const Duration(milliseconds: 15000)));
 
-      Map params = {"adblock": adblock, "website": website};
-
       // dio.httpClientAdapter = IOHttpClientAdapter(
       //   createHttpClient: () {
       //     final client = HttpClient();
-      //     client.findProxy = (uri) {
+      //     client.findProxy = (finalUri) {
       //       return 'PROXY 192.168.2.77:8888';
       //     };
       //     return client;
       //   },
       // );
-      final resp = await dio.downloadUri(uri, newProfilePath, data: params,
+      final resp = await dio.downloadUri(finalUri, newProfilePath,
           onReceiveProgress: (i, t) {
         Get.printInfo(info: "$i/$t");
       });
@@ -542,7 +549,8 @@ class ClashService extends GetxService {
       if (f.existsSync() && await changeYaml(f)) {
         // set subscription
         await SpUtil.setData('profile_$name', url);
-        mobileChannel.invokeMethod("addProfileForAndroid",{"proFilePath": newProfilePath});
+        mobileChannel.invokeMethod(
+            "addProfileForAndroid", {"proFilePath": newProfilePath});
         Get.bus.fire("ClashProvileUpdate");
         debugPrint('===============addProfile success');
         return true;

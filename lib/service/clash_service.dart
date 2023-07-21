@@ -235,13 +235,6 @@ class ClashService extends GetxService {
       SpUtil.setData('yaml', currentYaml.value);
       return resp.statusCode == 204;
     } else {
-      Future.delayed(Duration.zero, () {
-        Get.defaultDialog(
-            middleText: 'not a valid config file'.tr,
-            onConfirm: () {
-              Get.back();
-            });
-      });
       config.delete();
       return false;
     }

@@ -69,6 +69,7 @@ class ClashService extends GetxService {
       clashFFI.init_native_api_bridge(ffi.NativeApi.initializeApiDLData);
       return;
     } else {
+      return;
       fullPath = "libclashF.so";
     }
     final lib = ffi.DynamicLibrary.open(fullPath);
@@ -77,6 +78,9 @@ class ClashService extends GetxService {
   }
 
   Future<ClashService> init() async {
+    if (Platform.isAndroid) {
+      return this;
+    }
     _clashDirectory = await getApplicationSupportDirectory();
     // init config yaml
     final _ = SpUtil.getData('yaml', defValue: currentYaml.value);

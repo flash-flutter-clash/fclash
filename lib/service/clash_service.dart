@@ -5,7 +5,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'package:dio/dio.dart';
 import 'package:fclash/bean/clash_config_entity.dart';
-import 'package:fclash/fclash_init.dart';
+import 'package:fclash/fclash_service.dart';
 import 'package:fclash/generated_bindings.dart';
 import 'package:fclash/request/request.dart';
 import 'package:fclash/utils/sp_util.dart';
@@ -297,35 +297,28 @@ class ClashService extends GetxService {
   }
 
   Future<bool> setSystemProxy() async {
-    if (isDesktop) {
-      return false;
-    } else {
-      if (configEntity.value != null) {
-        final entity = configEntity.value!;
-        if (entity.mixedPort != 0) {
-          await mobileChannel
-              .invokeMethod("SetHttpPort", {"port": entity.mixedPort});
-        }
-        bool permission = await mobileChannel.invokeMethod("StartProxy");
-        print('permission:$permission');
-        if (permission) {
-          await setIsSystemProxy(true);
-          return true;
-        } else {
-          await setIsSystemProxy(false);
-          return false;
-        }
+    if (configEntity.value != null) {
+      final entity = configEntity.value!;
+      if (entity.mixedPort != 0) {
+        await mobileChannel
+            .invokeMethod("SetHttpPort", {"port": entity.mixedPort});
       }
-      return false;
+      bool permission = await mobileChannel.invokeMethod("StartProxy");
+      print('permission:$permission');
+      if (permission) {
+        await setIsSystemProxy(true);
+        return true;
+      } else {
+        await setIsSystemProxy(false);
+        return false;
+      }
     }
+    return false;
   }
 
   Future<void> clearSystemProxy({bool permanent = true}) async {
-    if (isDesktop) {
-    } else {
-      mobileChannel.invokeMethod("StopProxy");
-      await setIsSystemProxy(false);
-    }
+    mobileChannel.invokeMethod("StopProxy");
+    await setIsSystemProxy(false);
   }
 
   Future<bool> addProfile(String name, String url, String token,

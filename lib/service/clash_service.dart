@@ -3,23 +3,19 @@ import 'dart:convert';
 import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:isolate';
-
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
-
 import 'package:fclash/bean/clash_config_entity.dart';
 import 'package:fclash/fclash_init.dart';
 import 'package:fclash/generated_bindings.dart';
-import 'package:fclash/service/notification_service.dart';
+import 'package:fclash/request/request.dart';
+import 'package:fclash/utils/sp_util.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:get_event_bus/get_event_bus.dart';
-import 'package:kommon/kommon.dart' hide ProxyTypes;
+import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:proxy_manager/proxy_manager.dart';
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
@@ -129,8 +125,8 @@ class ClashService extends GetxService {
     // wait getx initialize
     Future.delayed(const Duration(seconds: 3), () {
       if (!Platform.isWindows) {
-        Get.find<NotificationService>()
-            .showNotification("OrcaVPN", "Is running".tr);
+        // Get.find<NotificationService>()
+        //     .showNotification("OrcaVPN", "Is running".tr);
       }
     });
     return this;
@@ -186,50 +182,10 @@ class ClashService extends GetxService {
     getProxies();
   }
 
-  // Future<bool> isRunning() async {
-  //   try {
-  //     final resp = await Request.get(clashBaseUrl,
-  //         options: Options(sendTimeout: 1000, receiveTimeout: 1000));
-  //     if ('clash' == resp['hello']) {
-  //       return true;
-  //     }
-  //     return false;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
-
   void initDaemon() async {
     printInfo(info: 'init clash service');
-    // wait for online
-    // while (!await isRunning()) {
-    //   printInfo(info: 'waiting online status');
-    //   await Future.delayed(const Duration(milliseconds: 500));
-    // }
-    // get traffic
-    // Timer.periodic(const Duration(seconds: 1), (t) async {
-    //   final traffic = await clashFFI.get_traffic();
-    //   if (kDebugMode) {
-    //     // debugPrint("$traffic");
-    //   }
-    //   try {
-    //     final trafficJson = jsonDecode(traffic);
-    //     uploadRate.value = trafficJson['Up'].toDouble() / 1024; // KB
-    //     downRate.value = trafficJson['Down'].toDouble() / 1024; // KB
-    //     // fix: 只有KDE不会导致Tray自动消失
-    //     // final desktop = Platform.environment['XDG_CURRENT_DESKTOP'];
-    //     // updateTray();
-    //   } catch (e) {
-    //     Get.printError(info: '$e');
-    //   }
-    // });
-    // system proxy
-    // listen port
     await reload();
     checkPort();
-    // if (isSystemProxy()) {
-    //   setSystemProxy();
-    // }
   }
 
   @override
@@ -240,10 +196,7 @@ class ClashService extends GetxService {
 
   Future<void> closeClashDaemon() async {
     Get.printInfo(info: 'fclash: closing daemon');
-    // double check
-    // stopClashSubP();
     if (isSystemProxy()) {
-      // just clear system proxy
       await clearSystemProxy(permanent: false);
     }
     await _clashLock?.unlock();
@@ -254,29 +207,10 @@ class ClashService extends GetxService {
         json.decode(clashFFI.get_proxies().cast<Utf8>().toDartString());
   }
 
-  /// @Deprecated
-  // Future<Stream<Uint8List>?> getTraffic() async {
-  //   Response<ResponseBody> resp = await Request.dioClient
-  //       .get('/traffic', options: Options(responseType: ResponseType.stream));
-  //   return resp.data?.stream;
-  // }
-
-  // @Deprecated
-  // Future<Stream<Uint8List>?> _getLog({String type = "info"}) async {
-  //   Response<ResponseBody> resp = await Request.dioClient.get('/logs',
-  //       options: Options(responseType: ResponseType.stream),
-  //       queryParameters: {"level": type});
-  //   return resp.data?.stream;
-  // }
-
   void startLogging() {
     final receiver = ReceivePort();
     logStream = receiver.asBroadcastStream();
-    // if (kDebugMode) {
-    //   logStream?.listen((event) {
-    //     debugPrint("LOG: ${event}");
-    //   });
-    // }
+
     final nativePort = receiver.sendPort.nativePort;
     debugPrint("port: $nativePort");
     clashFFI.start_log(nativePort);
@@ -360,25 +294,6 @@ class ClashService extends GetxService {
 
   Future<bool> setSystemProxy() async {
     if (isDesktop) {
-      if (configEntity.value != null) {
-        final entity = configEntity.value!;
-        if (entity.port != 0) {
-          await Future.wait([
-            proxyManager.setAsSystemProxy(
-                ProxyTypes.http, '127.0.0.1', entity.port!),
-            proxyManager.setAsSystemProxy(
-                ProxyTypes.https, '127.0.0.1', entity.port!)
-          ]);
-          debugPrint("set http");
-        }
-        if (entity.socksPort != 0 && !Platform.isWindows) {
-          debugPrint("set socks");
-          await proxyManager.setAsSystemProxy(
-              ProxyTypes.socks, '127.0.0.1', entity.socksPort!);
-        }
-        await setIsSystemProxy(true);
-        return true;
-      }
       return false;
     } else {
       if (configEntity.value != null) {
@@ -397,104 +312,15 @@ class ClashService extends GetxService {
           return false;
         }
       }
-      Get.bus.fire("ClashVPNStatusChanged");
       return false;
-
-      // await Clipboard.setData(
-      //     ClipboardData(text: "${configEntity.value?.port}"));
-      // final dialog = BrnDialog(
-      //   titleText: "请手动设置代理",
-      //   messageText:
-      //       "端口号已复制。请进入已连接WiFi的详情设置，将代理设置为手动，主机名填写127.0.0.1，端口填写${configEntity.value?.port}，然后返回点击已完成即可",
-      //   actionsText: ["取消", "已完成", "去设置填写"],
-      //   indexedActionCallback: (index) async {
-      //     if (index == 0) {
-      //       if (Get.isOverlaysOpen) {
-      //         Get.back();
-      //       }
-      //     } else if (index == 1) {
-      //       final proxy = await SystemProxy.getProxySettings();
-      //       if (proxy != null) {
-      //         if (proxy["host"] == "127.0.0.1" &&
-      //             int.parse(proxy["port"].toString()) ==
-      //                 configEntity.value?.port) {
-      //           Future.delayed(Duration.zero, () {
-      //             if (Get.overlayContext != null) {
-      //               BrnToast.show("设置成功", Get.overlayContext!);
-      //               setIsSystemProxy(true);
-      //             }
-      //           });
-      //           if (Get.isOverlaysOpen) {
-      //             Get.back();
-      //           }
-      //         }
-      //       } else {
-      //         Future.delayed(Duration.zero, () {
-      //           if (Get.overlayContext != null) {
-      //             BrnToast.show("好像未完成设置哦", Get.overlayContext!);
-      //           }
-      //         });
-      //       }
-      //     } else {
-      //       Future.delayed(Duration.zero, () {
-      //         BrnToast.show("端口号已复制", Get.context!);
-      //       });
-      //       await OpenSettings.openWIFISetting();
-      //     }
-      //   },
-      // );
-      // Get.dialog(dialog);
     }
   }
 
   Future<void> clearSystemProxy({bool permanent = true}) async {
     if (isDesktop) {
-      await proxyManager.cleanSystemProxy();
-      if (permanent) {
-        await setIsSystemProxy(false);
-      }
     } else {
       mobileChannel.invokeMethod("StopProxy");
       await setIsSystemProxy(false);
-      Get.bus.fire("ClashVPNStatusChanged");
-
-      // final dialog = BrnDialog(
-      //   titleText: "请手动设置代理",
-      //   messageText: "请进入已连接WiFi的详情设置，将代理设置为无",
-      //   actionsText: ["取消", "已完成", "去设置清除"],
-      //   indexedActionCallback: (index) async {
-      //     if (index == 0) {
-      //       if (Get.isOverlaysOpen) {
-      //         Get.back();
-      //       }
-      //     } else if (index == 1) {
-      //       final proxy = await SystemProxy.getProxySettings();
-      //       if (proxy != null) {
-      //         Future.delayed(Duration.zero, () {
-      //           if (Get.overlayContext != null) {
-      //             BrnToast.show("好像没有清除成功哦，当前代理${proxy}", Get.overlayContext!);
-      //           }
-      //         });
-      //       } else {
-      //         Future.delayed(Duration.zero, () {
-      //           if (Get.overlayContext != null) {
-      //             BrnToast.show("清除成功", Get.overlayContext!);
-      //           }
-      //           setIsSystemProxy(false);
-      //           if (Get.isOverlaysOpen) {
-      //             Get.back();
-      //           }
-      //         });
-      //       }
-      //     } else {
-      //       OpenSettings.openWIFISetting().then((_) async {
-      //         final proxy = await SystemProxy.getProxySettings();
-      //         debugPrint("$proxy");
-      //       });
-      //     }
-      //   },
-      // );
-      // Get.dialog(dialog);
     }
   }
 
@@ -551,7 +377,7 @@ class ClashService extends GetxService {
         await SpUtil.setData('profile_$name', url);
         mobileChannel.invokeMethod(
             "addProfileForAndroid", {"proFilePath": newProfilePath});
-        Get.bus.fire("ClashProvileUpdate");
+        // Get.bus.fire("ClashProvileUpdate");
         debugPrint('===============addProfile success');
         return true;
       }
@@ -716,8 +542,8 @@ class ClashService extends GetxService {
       await _clashLock?.lock();
     } catch (e) {
       if (!Platform.isWindows) {
-        await Get.find<NotificationService>()
-            .showNotification("Fclash", "Already running, Now exit.".tr);
+        // await Get.find<NotificationService>()
+        //     .showNotification("Fclash", "Already running, Now exit.".tr);
       }
       exit(0);
     }
@@ -736,73 +562,10 @@ Future<String> convertConfig(String content) async {
     Map doc = json.decode(json.encode(loadYaml(content, recover: true)));
     // 下载rule-provider对应的payload文件
     if (doc.containsKey('rule-providers')) {
-      // if (Get.overlayContext != null) {
-      //   final completer = Completer<bool>();
-      //   if (Get.isOverlaysOpen) {
-      //     Get.back();
-      //   }
-      //   BrnDialogManager.showConfirmDialog(Get.overlayContext!,
-      //       title: 'Convert profile'.tr,
-      //       message:
-      //           'Your profile contains RULE-SET which needs to convert to the profile supported by open source clash'
-      //               .tr,
-      //       cancel: 'Continue anyway'.tr,
-      //       confirm: 'OK'.tr, onCancel: () {
-      //     Get.back();
-      //     completer.complete(false);
-      //   }, onConfirm: () {
-      //     Get.back();
-      //     completer.complete(true);
-      //   }, barrierDismissible: false);
-      //   final res = await completer.future;
-      //   if (!res) {
-      //     return content;
-      //   }
-      // }
-      // BrnLoadingDialog.show(Get.overlayContext!);
       Map providers = doc['rule-providers'];
       final total = providers.keys.length;
       final index = 0.obs;
-      // 进度显示
-      // Get.dialog(BrnDialog(
-      //   titleText: 'Converting',
-      //   contentWidget: Center(
-      //     child: Obx(
-      //       () => Column(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           const SizedBox(
-      //             width: 25,
-      //             height: 25,
-      //             child: BrnPageLoading(),
-      //           ),
-      //           Text("$index/$total")
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ));
 
-      // var downloadFutures = <Future>[];
-      // for (final provider in providers.entries) {
-      //   downloadFutures.add(Future.delayed(Duration.zero, () async {
-      //     final key = provider.key;
-      //     final value = provider.value;
-      //     final url = value['url'];
-      //     // debugPrint("Downloading $url");
-      //     // if (url != null) {
-      //     //   final resp = await (Dio().get(url));
-      //     //   Map respDoc = loadYaml(resp.data, recover: true);
-      //     //   payloadMap[key] = List.of(respDoc['payload']);
-      //     //   debugPrint("$url completed");
-      //     index.value++;
-      //     // }
-      //   }));
-      // }
-      // await Future.wait(downloadFutures);
-      // if (Get.isOverlaysOpen) {
-      //   Get.back();
-      // }
       // 开始转换rules
       var rules = doc['rules'];
       var newRules = [];

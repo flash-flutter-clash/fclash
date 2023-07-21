@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:ffi/ffi.dart';
 
 import 'package:fclash/service/clash_service.dart';
-import 'package:flutter/foundation.dart';
 
 class NativeLibrary {
   /// Holds the symbol lookup function.
@@ -1046,7 +1045,7 @@ class NativeLibrary {
     String selector_name,
     String proxy_name,
   ) async {
-    if (Platform.isIOS ) {
+    if (Platform.isIOS) {
       var result = await mobileChannel.invokeMethod("change_proxy",
           {"selector_name": selector_name, "proxy_name": proxy_name}) as bool?;
       return result == true ? 0 : -1;

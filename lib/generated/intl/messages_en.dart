@@ -21,14 +21,5 @@ class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-        "About": MessageLookupByLibrary.simpleMessage("About"),
-        "Settings": MessageLookupByLibrary.simpleMessage("Settings"),
-        "allow_lan": MessageLookupByLibrary.simpleMessage("Allow LAN"),
-        "http_port": MessageLookupByLibrary.simpleMessage("HTTP Port"),
-        "log_level": MessageLookupByLibrary.simpleMessage("Log Level"),
-        "mode": MessageLookupByLibrary.simpleMessage("Mode"),
-        "proxies": MessageLookupByLibrary.simpleMessage("Proxies"),
-        "socks_port": MessageLookupByLibrary.simpleMessage("SOCKS5 Port")
-      };
+  static Map<String, Function> _notInlinedMessages(_) => <String, Function>{};
 }

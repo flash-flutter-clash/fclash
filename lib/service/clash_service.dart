@@ -353,15 +353,6 @@ class ClashService extends GetxService {
           sendTimeout: const Duration(milliseconds: 15000),
           receiveTimeout: const Duration(milliseconds: 15000)));
 
-      // dio.httpClientAdapter = IOHttpClientAdapter(
-      //   createHttpClient: () {
-      //     final client = HttpClient();
-      //     client.findProxy = (finalUri) {
-      //       return 'PROXY 192.168.2.77:8888';
-      //     };
-      //     return client;
-      //   },
-      // );
       final resp = await dio.downloadUri(finalUri, newProfilePath,
           onReceiveProgress: (i, t) {
         Get.printInfo(info: "$i/$t");

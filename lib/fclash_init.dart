@@ -20,11 +20,6 @@ Future<void> initFclashService(String configFileUrl,
   if (isDesktop) {
     await Get.putAsync(() => AutostartService().init());
   }
-  // 配置
-  if (configFileUrl.isNotEmpty) {
-    await Get.find<ClashService>()
-        .addProfile(configFileName, configFileUrl, token);
-  }
 }
 
 // 设置为系统代理：开启vpn

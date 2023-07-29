@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:dio/io.dart';
 
 import 'package:dio/dio.dart';
 
@@ -12,6 +14,15 @@ Dio _initDio({String? baseUrl, int timeoutMs = 10000}) {
     receiveDataWhenStatusError: true,
   );
   Dio dioClient = Dio(baseOpts); // 实例化请求，可以传入options参数
+  // dioClient.httpClientAdapter = IOHttpClientAdapter(
+  //   createHttpClient: () {
+  //     final client = HttpClient();
+  //     client.findProxy = (uri) {
+  //       return 'PROXY 192.168.2.77:8888';
+  //     };
+  //     return client;
+  //   },
+  // );
   dioClient.interceptors.addAll([
     LogsInterceptors(),
   ]);

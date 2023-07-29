@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;
 import 'dart:io';
+import 'package:dio/io.dart';
 import 'dart:isolate';
 import 'package:dio/dio.dart';
 import 'package:fclash/bean/clash_config_entity.dart';

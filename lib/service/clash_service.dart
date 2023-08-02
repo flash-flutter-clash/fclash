@@ -357,13 +357,16 @@ class ClashService extends GetxService {
       // BrnToast.show("Error: ${e}", Get.context!);
     } finally {
       final f = File(newProfilePath);
+      if(Platform.isAndroid && f.existsSync()){
+        mobileChannel.invokeMethod(
+            "addProfileForAndroid", {"proFilePath": newProfilePath});
+        return true;
+      }
+
       if (f.existsSync() && await changeYaml(f)) {
         // set subscription
         await SpUtil.setData('profile_$name', url);
-        mobileChannel.invokeMethod(
-            "addProfileForAndroid", {"proFilePath": newProfilePath});
         // Get.bus.fire("ClashProvileUpdate");
-        debugPrint('===============addProfile success');
         return true;
       }
       return false;

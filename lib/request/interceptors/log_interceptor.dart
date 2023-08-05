@@ -8,6 +8,8 @@ class LogsInterceptors extends InterceptorsWrapper {
   // 请求拦截
   @override
   onRequest(RequestOptions options, handler) async {
+    // options.headers.addAll({'Authorization': "Bearer u4nb99dUDu"});
+
     if (kDebugMode) {
       print(
           """请求url：${options.baseUrl + options.path}${options.queryParameters}\n请求类型：${options.method}\n请求头：${options.headers.toString()}""");

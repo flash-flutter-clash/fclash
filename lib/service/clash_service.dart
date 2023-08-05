@@ -79,6 +79,12 @@ class ClashService extends GetxService {
 
   Future<ClashService> init() async {
     _clashDirectory = await getApplicationSupportDirectory();
+    if (Platform.isIOS) {
+      String path = await mobileChannel.invokeMethod("getClashFolderPath");
+      _clashDirectory = await Directory.fromUri(Uri.file(path));
+    } else {
+      _clashDirectory = await getApplicationSupportDirectory();
+    }
     // init config yaml
     final _ = SpUtil.getData('yaml', defValue: currentYaml.value);
     initializedHttpPort = SpUtil.getData('http-port', defValue: 12346);
@@ -86,50 +92,51 @@ class ClashService extends GetxService {
     initializedMixedPort = SpUtil.getData('mixed-port', defValue: 12348);
     currentYaml.value = _;
     Request.setBaseUrl(clashBaseUrl);
-    // init clash
-    // kill all other clash clients
-    final clashConfigPath = p.join(_clashDirectory.path, "clash");
-    _clashDirectory = Directory(clashConfigPath);
-    print("flash work directory: ${_clashDirectory.path}");
-    final clashConf = p.join(_clashDirectory.path, currentYaml.value);
-    final countryMMdb = p.join(_clashDirectory.path, 'Country.mmdb');
-    if (!await _clashDirectory.exists()) {
-      await _clashDirectory.create(recursive: true);
-    }
-    // copy executable to directory
-    final mmdb = await rootBundle.load('assets/tp/clash/Country.mmdb');
-    // write to clash dir
-    final mmdbF = File(countryMMdb);
-    if (!mmdbF.existsSync()) {
-      await mmdbF.writeAsBytes(mmdb.buffer.asInt8List());
-    }
-    final config = await rootBundle.load('assets/tp/clash/config.yaml');
-    // write to clash dir
-    final configF = File(clashConf);
-    if (!configF.existsSync()) {
-      await configF.writeAsBytes(config.buffer.asInt8List());
-    }
+    // // init clash
+    // // kill all other clash clients
+    // final clashConfigPath = p.join(_clashDirectory.path, "clash");
+    // _clashDirectory = Directory(clashConfigPath);
+    // print("flash work directory: ${_clashDirectory.path}");
+    // final clashConf = p.join(_clashDirectory.path, currentYaml.value);
+    // final countryMMdb = p.join(_clashDirectory.path, 'Country.mmdb');
+    // if (!await _clashDirectory.exists()) {
+    //   await _clashDirectory.create(recursive: true);
+    // }
+    // // copy executable to directory
+    // final mmdb = await rootBundle.load('assets/tp/clash/Country.mmdb');
+    // // write to clash dir
+    // final mmdbF = File(countryMMdb);
+    // if (!mmdbF.existsSync()) {
+    //   await mmdbF.writeAsBytes(mmdb.buffer.asInt8List());
+    // }
+    // final config = await rootBundle.load('assets/tp/clash/config.yaml');
+    // // write to clash dir
+    // final configF = File(clashConf);
+    // if (!configF.existsSync()) {
+    //   await configF.writeAsBytes(config.buffer.asInt8List());
+    // }
     // create or detect lock file
-    await _acquireLock(_clashDirectory);
-    // ffi
-    clashFFI.set_home_dir(_clashDirectory.path.toNativeUtf8().cast());
-    clashFFI.clash_init(_clashDirectory.path);
-    clashFFI.set_config(clashConf.toNativeUtf8().cast());
-    clashFFI.set_ext_controller(clashExtPort);
-    if (clashFFI.parse_options() == 0) {
-      Get.printInfo(info: "parse ok");
-    }
-    Future.delayed(Duration.zero, () {
-      initDaemon();
-    });
+    // await _acquireLock(_clashDirectory);
+    // clashFFI.set_home_dir(_clashDirectory.path.toNativeUtf8().cast());
+    // final clash_init_result = clashFFI.clash_init(_clashDirectory.path);
+    // print("clash_init_result: ${clash_init_result}");
 
-    // wait getx initialize
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!Platform.isWindows) {
-        // Get.find<NotificationService>()
-        //     .showNotification("OrcaVPN", "Is running".tr);
-      }
-    });
+    // clashFFI.set_config(clashConf.toNativeUtf8().cast());
+    // clashFFI.set_ext_controller(clashExtPort);
+    // if (clashFFI.parse_options() == 0) {
+    //   Get.printInfo(info: "parse ok");
+    // }
+    // Future.delayed(Duration.zero, () {
+    //   initDaemon();
+    // });
+
+    // // wait getx initialize
+    // Future.delayed(const Duration(seconds: 3), () {
+    //   if (!Platform.isWindows) {
+    //     // Get.find<NotificationService>()
+    //     //     .showNotification("OrcaVPN", "Is running".tr);
+    //   }
+    // });
     return this;
   }
 
@@ -208,6 +215,10 @@ class ClashService extends GetxService {
         json.decode(clashFFI.get_proxies().cast<Utf8>().toDartString());
   }
 
+  int parse_options() {
+    return clashFFI.parse_options();
+  }
+
   void startLogging() {
     final receiver = ReceivePort();
     logStream = receiver.asBroadcastStream();
@@ -227,17 +238,22 @@ class ClashService extends GetxService {
       await File(config.path).writeAsString(content);
     }
     // judge valid
-    if (clashFFI.is_config_valid(config.path.toNativeUtf8().cast()) == 0) {
-      final resp = await Request.dioClient.put('/configs',
-          queryParameters: {"force": false}, data: {"path": config.path});
-      Get.printInfo(info: 'config changed ret: ${resp.statusCode}');
-      currentYaml.value = basename(config.path);
-      clashFFI.set_config(config.path.toNativeUtf8().cast());
-      SpUtil.setData('yaml', currentYaml.value);
-      return resp.statusCode == 204;
-    } else {
-      config.delete();
-      return false;
+    try {
+      if (clashFFI.is_config_valid(config.path.toNativeUtf8().cast()) == 0) {
+        final resp = await Request.dioClient.put('/configs',
+            queryParameters: {"force": false}, data: {"path": config.path});
+        Get.printInfo(info: 'config changed ret: ${resp.statusCode}');
+        currentYaml.value = basename(config.path);
+        clashFFI.set_config(config.path.toNativeUtf8().cast());
+        SpUtil.setData('yaml', currentYaml.value);
+        return resp.statusCode == 204;
+      } else {
+        config.delete();
+        return false;
+      }
+    } catch (e) {
+    } finally {
+      return true;
     }
   }
 
@@ -318,60 +334,57 @@ class ClashService extends GetxService {
     }
   }
 
-  Future<bool> addProfile(String name, String url, String token,
-      {bool adblock = false, bool website = false}) async {
-    final configName = '$name.yaml';
-    final newProfilePath = join(_clashDirectory.path, configName);
-    File configFile = File(newProfilePath);
-    deleteProfile(configFile);
-    try {
-      final String adblockString = adblock ? "true" : "false";
-      final String websiteString = website ? "true" : "false";
+  // Future<bool> addProfile(String name, String url, String token,
+  //     {bool adblock = false, bool website = false}) async {
+  //   final configName = '$name.yaml';
+  //   final newProfilePath = join(_clashDirectory.path, configName);
+  //   File configFile = File(newProfilePath);
+  //   deleteProfile(configFile);
+  //   try {
+  //     final String adblockString = adblock ? "true" : "false";
+  //     final String websiteString = website ? "true" : "false";
 
-      Map<String, dynamic> params = {
-        "adblock": adblockString,
-        "website": websiteString
-      };
-      final uri = Uri.tryParse(url);
-      if (uri == null) {
-        return false;
-      }
+  //     Map<String, dynamic> params = {
+  //       "adblock": adblockString,
+  //       "website": websiteString
+  //     };
+  //     final uri = Uri.tryParse(url);
+  //     if (uri == null) {
+  //       return false;
+  //     }
 
-      final finalUri = uri.replace(queryParameters: params); //USE THIS
+  //     final finalUri = uri.replace(queryParameters: params); //USE THIS
 
-      var dio = Dio(BaseOptions(
-          headers: {
-            'User-Agent': 'Fclash',
-            'Authorization': token,
-          },
-          sendTimeout: const Duration(milliseconds: 15000),
-          receiveTimeout: const Duration(milliseconds: 15000)));
+  //     var dio = Dio(BaseOptions(
+  //         headers: {
+  //           'User-Agent': 'Fclash',
+  //           'Authorization': token,
+  //         },
+  //         sendTimeout: const Duration(milliseconds: 15000),
+  //         receiveTimeout: const Duration(milliseconds: 15000)));
 
-      final resp = await dio.downloadUri(finalUri, newProfilePath,
-          onReceiveProgress: (i, t) {
-        Get.printInfo(info: "$i/$t");
-      });
-      return resp.statusCode == 200;
-    } catch (e) {
-      print(e);
-      // BrnToast.show("Error: ${e}", Get.context!);
-    } finally {
-      final f = File(newProfilePath);
-      if(Platform.isAndroid && f.existsSync()){
-        mobileChannel.invokeMethod(
-            "addProfileForAndroid", {"proFilePath": newProfilePath});
-        return true;
-      }
-
-      if (f.existsSync() && await changeYaml(f)) {
-        // set subscription
-        await SpUtil.setData('profile_$name', url);
-        // Get.bus.fire("ClashProvileUpdate");
-        return true;
-      }
-      return false;
-    }
-  }
+  //     final resp = await dio.downloadUri(finalUri, newProfilePath,
+  //         onReceiveProgress: (i, t) {
+  //       Get.printInfo(info: "$i/$t");
+  //     });
+  //     return resp.statusCode == 200;
+  //   } catch (e) {
+  //     print(e);
+  //     // BrnToast.show("Error: ${e}", Get.context!);
+  //   } finally {
+  //     final f = File(newProfilePath);
+  //     if (f.existsSync() && await changeYaml(f)) {
+  //       // set subscription
+  //       await SpUtil.setData('profile_$name', url);
+  //       mobileChannel.invokeMethod(
+  //           "addProfileForAndroid", {"proFilePath": newProfilePath});
+  //       // Get.bus.fire("ClashProvileUpdate");
+  //       debugPrint('===============addProfile success');
+  //       return true;
+  //     }
+  //     return false;
+  //   }
+  // }
 
   Future<bool> deleteProfile(FileSystemEntity config) async {
     if (config.existsSync()) {
@@ -419,6 +432,7 @@ class ClashService extends GetxService {
       });
       return completer.future;
     } catch (e) {
+      debugPrint("delay error:$e");
       return -1;
     }
   }
